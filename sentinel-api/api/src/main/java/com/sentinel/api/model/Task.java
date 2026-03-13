@@ -17,6 +17,9 @@ public class Task {
     @Column(nullable = false)
     private String status;
 
+    @Column(columnDefinition = "TEXT")
+    private String outputLog;
+
     private LocalDateTime createdAt;
 
 
@@ -68,5 +71,13 @@ public class Task {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getOutputLog() {
+        return outputLog;
+    }
+
+    public void setOutputLog(String outputLog) {
+        this.outputLog = outputLog;
     }
 }
