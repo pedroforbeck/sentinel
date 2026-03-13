@@ -28,3 +28,23 @@ Content-Type: application/json
 
 ### Delete Machine ID 1
 DELETE http://localhost:8080/api/machines/1
+
+### Create Task for Machine Id
+POST http://localhost:8080/api/tasks/machine/4
+Content-Type: application/json
+
+{
+  "command": "ping 8.8.8.8",
+  "status": "PENDING"
+}
+
+### Agent of Machine 4 asks for pending tasks
+GET http://localhost:8080/api/tasks/machine/4/pending
+
+### O Agente notificate that task 1 is completed
+PUT http://localhost:8080/api/tasks/1/status
+Content-Type: application/json
+
+{
+  "status": "COMPLETED"
+}
