@@ -1,0 +1,30 @@
+### New Machine (POST)
+POST http://localhost:8080/api/machines
+Content-Type: application/json
+
+{
+  "hostname": "PC-GABINETE-01",
+  "ipAddress": "192.168.0.15",
+  "os": "Windows 11",
+  "status": "ONLINE"
+}
+
+### Get All Machines (GET)
+GET http://localhost:8080/api/machines
+
+### Get Machines with ID 1
+GET http://localhost:8080/api/machines/3
+
+### Patch Machine with ID 1
+PUT http://localhost:8080/api/machines/3
+Content-Type: application/json
+
+{
+  "hostname": "PC-GABINETE-01-REVISADO",
+  "ipAddress": "192.168.0.15",
+  "os": "Windows 11",
+  "status": "OFFLINE"
+}
+
+### Delete Machine ID 1
+DELETE http://localhost:8080/api/machines/1
