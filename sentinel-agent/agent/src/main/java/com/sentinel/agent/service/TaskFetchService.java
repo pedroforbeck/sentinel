@@ -14,20 +14,31 @@ import java.nio.charset.StandardCharsets;
 public class TaskFetchService {
 
     private final RestTemplate restTemplate;
+    private final RegistrationService registrationService; // Required for dynamic ID
 
-    // Using your API's base URL. Machine ID is still hardcoded to 4 for now.
-    private final String pendingUrl = "http://localhost:8080/api/tasks/machine/4/pending";
-    private final String updateUrl = "http://localhost:8080/api/tasks/"; // + taskId + "/status"
+    private final String baseUrl = "http://localhost:8080/api/tasks";
 
-    public TaskFetchService() {
-        this.restTemplate = new RestTemplate();
+    // Constructor Injection (Spring will pass the custom RestTemplate with the API Key)
+    public TaskFetchService(RestTemplate restTemplate, RegistrationService registrationService) {
+        this.restTemplate = restTemplate;
+        this.registrationService = registrationService;
     }
 
     @Scheduled(fixedRate = 10000)
     public void fetchPendingTasks() {
-        System.out.println("[AGENT] Polling API for new tasks...");
+        // 1. Get the dynamic ID from the Registration Service
+        Long myId = registrationService.getCurrentMachineId();
+
+        if (myId == null) {
+            System.out.println("[AGENT] Standing by. Awaiting valid Machine ID from HQ...");
+            return;
+        }
+
+        System.out.println("[AGENT] Polling API for new tasks for Machine ID: " + myId + "...");
 
         try {
+            // 2. Build the URL dynamically
+            String pendingUrl = baseUrl + "/machine/" + myId + "/pending";
             TaskDTO[] pendingTasks = restTemplate.getForObject(pendingUrl, TaskDTO[].class);
 
             if (pendingTasks != null && pendingTasks.length > 0) {
@@ -36,10 +47,7 @@ public class TaskFetchService {
                 for (TaskDTO task : pendingTasks) {
                     System.out.println(" -> Executing Task ID: " + task.id() + " | Command: '" + task.command() + "'");
 
-                    // 1. Execute the command on Windows
                     String executionLog = executeWindowsCommand(task.command());
-
-                    // 2. Send the result back to the API
                     reportTaskCompletion(task.id(), executionLog);
                 }
             } else {
@@ -55,21 +63,18 @@ public class TaskFetchService {
     private String executeWindowsCommand(String command) {
         StringBuilder output = new StringBuilder();
         try {
-            // "cmd.exe /c" tells Windows to run the command and terminate the shell
             ProcessBuilder builder = new ProcessBuilder("cmd.exe", "/c", command);
-            builder.redirectErrorStream(true); // Merges standard errors with standard output
+            builder.redirectErrorStream(true);
 
             Process process = builder.start();
 
-            // Read the terminal's black screen text line by line
-            // StandardCharsets.UTF_8 or "CP850" depending on your Windows language settings
             BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8));
             String line;
             while ((line = reader.readLine()) != null) {
                 output.append(line).append("\n");
             }
 
-            process.waitFor(); // Wait for the command (like ping) to finish
+            process.waitFor();
 
         } catch (Exception e) {
             output.append("Execution failed: ").append(e.getMessage());
@@ -80,10 +85,9 @@ public class TaskFetchService {
     // Method responsible for sending the PUT request back to the API
     private void reportTaskCompletion(Long taskId, String outputLog) {
         try {
-            String fullUrl = updateUrl + taskId + "/status";
+            String fullUrl = baseUrl + "/" + taskId + "/status";
             TaskResultDTO resultPayload = new TaskResultDTO("COMPLETED", outputLog);
 
-            // Send the PUT request
             restTemplate.put(fullUrl, resultPayload);
             System.out.println("[AGENT] Task " + taskId + " reported as COMPLETED back to HQ.\n");
 
