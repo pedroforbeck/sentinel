@@ -18,8 +18,8 @@ public class RegistrationService {
     // This will hold the official ID given by the HQ
     private Long currentMachineId = null;
 
-    public RegistrationService() {
-        this.restTemplate = new RestTemplate();
+    public RegistrationService(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate; // Spring will inject the configured one
     }
 
     @PostConstruct
