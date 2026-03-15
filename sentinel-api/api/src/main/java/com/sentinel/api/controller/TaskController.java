@@ -1,12 +1,13 @@
 package com.sentinel.api.controller;
 
-
 import com.sentinel.api.dto.in.TaskRequestDTO;
 import com.sentinel.api.dto.out.TaskResponseDTO;
 import com.sentinel.api.model.Machine;
 import com.sentinel.api.model.Task;
 import com.sentinel.api.repository.MachineRepository;
 import com.sentinel.api.repository.TaskRepository;
+import com.sentinel.api.service.TaskProducerService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,10 +19,12 @@ public class TaskController {
 
     private final TaskRepository taskRepository;
     private final MachineRepository machineRepository;
+    private final TaskProducerService taskProducerService;
 
-    public TaskController(TaskRepository taskRepository, MachineRepository machineRepository) {
+    public TaskController(TaskRepository taskRepository, MachineRepository machineRepository, TaskProducerService taskProducerService) {
         this.taskRepository = taskRepository;
         this.machineRepository = machineRepository;
+        this.taskProducerService = taskProducerService;
     }
 
     // 1. Create task
@@ -32,7 +35,7 @@ public class TaskController {
 
         Task newTask = new Task();
         newTask.setCommand(dtoIn.command());
-        newTask.setStatus(dtoIn.status());
+        newTask.setStatus("PENDING"); // Always starts as pending
         newTask.setMachine(machine);
 
         Task taskSaved= taskRepository.save(newTask);
@@ -46,7 +49,7 @@ public class TaskController {
     public List<TaskResponseDTO> getPendingTasksForMachine(@PathVariable Long machineId) {
         List<Task> tasksInDB = taskRepository.findByMachineIdAndStatus(machineId, "PENDING");
 
-        return tasksInDB .stream()
+        return tasksInDB.stream()
                 .map(task -> new TaskResponseDTO(task.getId(), task.getCommand(), task.getStatus(),
                         task.getOutputLog(), task.getCreatedAt(), task.getMachine().getId()))
                 .collect(Collectors.toList());
@@ -54,18 +57,11 @@ public class TaskController {
 
     // 3. Update Status/Log
     @PutMapping("/{taskId}/status")
-    public TaskResponseDTO updateTaskStatus(@PathVariable Long taskId, @RequestBody TaskRequestDTO dtoIn) {
-        return taskRepository.findById(taskId)
-                .map(existingTask -> {
-                    existingTask.setStatus(dtoIn.status());
-                    existingTask.setOutputLog(dtoIn.outputLog());
+    public ResponseEntity<Void> updateTaskStatus(@PathVariable Long taskId, @RequestBody TaskRequestDTO dtoIn) {
 
-                    Task updatedTask = taskRepository.save(existingTask);
+        taskProducerService.sendTaskResultToQueue(taskId, dtoIn.status(), dtoIn.outputLog());
 
-                    return new TaskResponseDTO(updatedTask.getId(), updatedTask.getCommand(),
-                            updatedTask.getStatus(), updatedTask.getOutputLog(),
-                            updatedTask.getCreatedAt(), updatedTask.getMachine().getId());
-                })
-                .orElseThrow(() -> new RuntimeException("Task not found!"));
+        // Returns a 202 ACCEPTED HTTP status, meaning: "I received it and will process it in the background"
+        return ResponseEntity.accepted().build();
     }
 }
