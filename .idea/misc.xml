@@ -6,6 +6,7 @@
       <list>
         <option value="$PROJECT_DIR$/sentinel-api/api/pom.xml" />
         <option value="$PROJECT_DIR$/sentinel-agent/agent/agent/pom.xml" />
+        <option value="$PROJECT_DIR$/sentinel-agent/agent/pom.xml" />
       </list>
     </option>
   </component>
