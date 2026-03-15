@@ -66,3 +66,12 @@ Content-Type: application/json
   "hostname": "DESKTOP-COMMANDER",
   "os": "Windows 11"
 }
+
+### Create a task for the Agent
+POST http://localhost:8080/api/tasks/machine/6
+Content-Type: application/json
+X-API-KEY: 7b2c8a9f-3e4d-4a1b-9c8d-7e6f5a4b3c2d
+
+{
+  "command": "ping google.com"
+}
