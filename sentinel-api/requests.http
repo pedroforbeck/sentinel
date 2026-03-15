@@ -57,3 +57,12 @@ Content-Type: application/json
   "status": "COMPLETED",
   "outputLog": "Shooting against 8.8.8.8 com 32 bytes of data:\nResponse from 8.8.8.8: bytes=32 time=14ms TTL=117\nResponse from 8.8.8.8: bytes=32 time=15ms TTL=117\n\nPing Statistics para 8.8.8.8:\nPackages: Send = 2, Received = 2, Lost = 0"
 }
+
+### Agent Registration Test
+POST http://localhost:8080/api/machines/register
+Content-Type: application/json
+
+{
+  "hostname": "DESKTOP-COMMANDER",
+  "os": "Windows 11"
+}
