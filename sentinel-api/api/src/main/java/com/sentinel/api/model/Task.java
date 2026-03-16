@@ -2,9 +2,10 @@ package com.sentinel.api.model;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "tasks")
+@Table(name = "task")
 public class Task {
 
     @Id

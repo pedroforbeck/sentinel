@@ -1,10 +1,11 @@
 package com.sentinel.api.model;
 
 import jakarta.persistence.*;
+import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "machines")
+@Table(name = "machine")
 public class Machine {
 
     @Id
