@@ -1,4 +1,4 @@
-package com.sentinel.api;
+package com.sentinel.api.stress;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -22,15 +22,15 @@ public class SentinelStressTest {
     private static final int CONCURRENT_THREADS = 100;
 
     public static void main(String[] args) throws InterruptedException {
-        System.out.println("🚀 Iniciando Teste de Stress no Sentinel HQ...");
-        System.out.println("Alvo: " + TOTAL_REQUESTS + " requisições usando " + CONCURRENT_THREADS + " threads simultâneas.\n");
+        System.out.println("🚀 Initiating Stress Test on Sentinel HQ...");
+        System.out.println("Target: " + TOTAL_REQUESTS + " requests using " + CONCURRENT_THREADS + " concurrent threads.\n");
 
         HttpClient client = HttpClient.newBuilder()
                 .connectTimeout(Duration.ofSeconds(10))
                 .build();
 
         ExecutorService executor = Executors.newFixedThreadPool(CONCURRENT_THREADS);
-
+        
         AtomicInteger successCount = new AtomicInteger(0);
         AtomicInteger errorCount = new AtomicInteger(0);
 
@@ -40,7 +40,7 @@ public class SentinelStressTest {
             final int requestNumber = i;
             executor.submit(() -> {
                 try {
-                    // 1. DISPARO 1: Cria a Tarefa (Força o Banco de Dados)
+                    // 1. SHOT 1: Create the Task (Stresses the Database)
                     String createPayload = "{\"command\": \"echo stress_test_" + requestNumber + "\"}";
                     HttpRequest createReq = HttpRequest.newBuilder()
                             .uri(URI.create(API_URL + "/machine/" + MACHINE_ID))
@@ -52,11 +52,11 @@ public class SentinelStressTest {
                     HttpResponse<String> createRes = client.send(createReq, HttpResponse.BodyHandlers.ofString());
 
                     if (createRes.statusCode() == 200) {
-                        // Extrai o ID da tarefa criada usando uma regex simples
+                        // Extract the created task ID using a simple regex
                         String responseBody = createRes.body();
                         String taskId = responseBody.replaceAll(".*\"id\":\\s*(\\d+).*", "$1");
 
-                        // 2. DISPARO 2: Responde a Tarefa (Força o Kafka e o Consumer)
+                        // 2. SHOT 2: Complete the Task (Stresses Kafka and the Consumer)
                         String updatePayload = "{\"status\": \"COMPLETED\", \"outputLog\": \"Stress test payload delivered.\"}";
                         HttpRequest updateReq = HttpRequest.newBuilder()
                                 .uri(URI.create(API_URL + "/" + taskId + "/status"))
@@ -82,17 +82,17 @@ public class SentinelStressTest {
             });
         }
 
-        // Aguarda todas as threads terminarem os disparos
+        // Wait for all threads to finish firing
         executor.shutdown();
         executor.awaitTermination(1, TimeUnit.MINUTES);
 
         long endTime = System.currentTimeMillis();
         long totalTimeMs = endTime - startTime;
 
-        System.out.println("\n🏁 TESTE CONCLUÍDO!");
-        System.out.println("⏱️ Tempo total: " + totalTimeMs + " ms");
-        System.out.println("✅ Sucessos: " + successCount.get());
-        System.out.println("❌ Falhas: " + errorCount.get());
-        System.out.println("⚡ Taxa de transferência: " + (TOTAL_REQUESTS * 1000L / totalTimeMs) + " missões completas por segundo");
+        System.out.println("\n🏁 TEST COMPLETE!");
+        System.out.println("⏱️ Total time: " + totalTimeMs + " ms");
+        System.out.println("✅ Successes: " + successCount.get());
+        System.out.println("❌ Failures: " + errorCount.get());
+        System.out.println("⚡ Throughput: " + (TOTAL_REQUESTS * 1000L / Math.max(totalTimeMs, 1)) + " requests per second");
     }
 }
