@@ -6,23 +6,23 @@
   <h1 style="color: #FFFFFF; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
     <b>SENTINEL</b>
   </h1>
-  <p style="color: #A1A1A6;"><i>Centralized API Gateway & Security Monitoring Microservice</i></p>
+  <p style="color: #A1A1A6;"><i>Event-Driven Monitoring & Security Auditing Microservice</i></p>
 
   <a href="https://github.com/pedroforbeck/sentinel">
-    <img src="https://readme-typing-svg.demolab.com?font=-apple-system,BlinkMacSystemFont,San+Francisco,Helvetica+Neue&weight=400&size=14&duration=4000&pause=1000&color=A1A1A6&center=true&vCenter=true&width=600&lines=Zero-Trust+Security+Architecture;Centralized+API+Gateway;Rate+Limiting+%26+Traffic+Control;Work+in+Progress+Ecosystem" alt="Typing SVG" />
+    <img src="https://readme-typing-svg.demolab.com?font=-apple-system,BlinkMacSystemFont,San+Francisco,Helvetica+Neue&weight=400&size=14&duration=4000&pause=1000&color=A1A1A6&center=true&vCenter=true&width=600&lines=Event-Driven+Architecture;Apache+Kafka+Message+Broker;Distributed+Tracing+%26+Auditing;Work+in+Progress+Ecosystem" alt="Typing SVG" />
   </a>
 
   <br><br>
 
   <img src="https://img.shields.io/badge/Java_17-1C1C1E?style=for-the-badge&logo=openjdk&logoColor=white" alt="Java" />
-  <img src="https://img.shields.io/badge/Spring_Cloud-1C1C1E?style=for-the-badge&logo=spring&logoColor=white" alt="Spring Cloud" />
-  <img src="https://img.shields.io/badge/Redis-1C1C1E?style=for-the-badge&logo=redis&logoColor=white" alt="Redis" />
-  <img src="https://img.shields.io/badge/Docker-1C1C1E?style=for-the-badge&logo=docker&logoColor=white" alt="Docker" />
+  <img src="https://img.shields.io/badge/Spring_Boot-1C1C1E?style=for-the-badge&logo=spring-boot&logoColor=white" alt="Spring Boot" />
+  <img src="https://img.shields.io/badge/Apache_Kafka-1C1C1E?style=for-the-badge&logo=apachekafka&logoColor=white" alt="Apache Kafka" />
+  <img src="https://img.shields.io/badge/PostgreSQL-1C1C1E?style=for-the-badge&logo=postgresql&logoColor=white" alt="PostgreSQL" />
 
   <br><br>
 
-  <img src="https://img.shields.io/badge/Role-API%20Gateway-1C1C1E?style=for-the-badge&logo=kong&logoColor=white" alt="Role" />
-  <img src="https://img.shields.io/badge/Pattern-Zero%20Trust-1C1C1E?style=for-the-badge&logo=auth0&logoColor=white" alt="Pattern" />
+  <img src="https://img.shields.io/badge/Role-Event%20Consumer-1C1C1E?style=for-the-badge&logo=apachekafka&logoColor=white" alt="Role" />
+  <img src="https://img.shields.io/badge/Pattern-Async%20Auditing-1C1C1E?style=for-the-badge&logo=confluent&logoColor=white" alt="Pattern" />
   <img src="https://img.shields.io/badge/Status-Work%20In%20Progress-FF9F0A?style=for-the-badge&logo=git&logoColor=white" alt="Status" />
 
 </div>
@@ -30,7 +30,7 @@
 <br><br>
 
 > **Abstract**<br>
-> This repository contains **Sentinel**, an intelligent API Gateway and security layer currently under active development. Acting as the single point of entry for the ecosystem, its primary responsibility is to handle cross-cutting concerns such as authentication, request routing, rate limiting, and threat monitoring before traffic ever hits the underlying domain microservices.
+> This repository contains **Sentinel**, a centralized monitoring and auditing service currently under active development. Acting as the silent observer of the ecosystem, its primary responsibility is to consume events asynchronously via **Apache Kafka**. It records user actions, system alerts, and task statuses in real-time, providing an immutable audit trail without impacting the performance of the core domain microservices.
 
 <br>
 
@@ -45,7 +45,7 @@
 
 ## <img src="https://icongr.am/feather/cpu.svg?size=24&color=A1A1A6" align="absmiddle" /> System Architecture
 
-By abstracting security and routing away from the core services (like the Task Engine and Notification Service), the ecosystem becomes inherently more scalable and secure. Sentinel intercepts incoming external requests, validates JWT tokens, checks rate limits against a Redis cache, and securely proxies the request to the correct internal port.
+By leveraging a message broker, Sentinel completely decouples the logging and monitoring logic from the rest of the application. Core services (like the Task Engine) simply publish events to Kafka topics and continue executing. Sentinel independently consumes these topics, processes the payloads, and persists them for future querying and security analysis.
 
 <br>
 
@@ -58,20 +58,20 @@ flowchart TD;
     %% Glassmorphism / Apple Aesthetic Styling
     classDef default fill:none,stroke:#A1A1A6,stroke-width:1px,color:#A1A1A6,rx:8,ry:8;
     classDef highlight fill:none,stroke:#FFFFFF,stroke-width:2px,color:#FFFFFF,rx:12,ry:12;
-    classDef cache fill:none,stroke:#FF3B30,stroke-width:1px,color:#FF3B30,rx:4,ry:4;
+    classDef kafka fill:none,stroke:#FFFFFF,stroke-width:1px,color:#FFFFFF,stroke-dasharray: 5 5,rx:4,ry:4;
 
     %% Nodes
-    ClientMobile([External Clients]):::default
-    Sentinel{Sentinel Gateway\nPort 8080}:::highlight
-    Redis[(Redis\nRate Limiting)]:::cache
     TaskService[Task Engine\nPort 8082]:::default
     NotifyService[Notification Service\nPort 8083]:::default
+    Broker{{Apache Kafka\nMessage Broker}}:::kafka
+    Sentinel{Sentinel Service\nPort 8084}:::highlight
+    DB[(Audit Database\nPostgreSQL)]:::default
 
     %% Connections
-    ClientMobile -->|"REST / HTTPS"| Sentinel
-    Sentinel <-->|"Validates Session and Rate Limits"| Redis
-    Sentinel -->|"Proxy / Routing"| TaskService
-    Sentinel -->|"Proxy / Routing"| NotifyService
+    TaskService -->|"Publishes Task Events"| Broker
+    NotifyService -->|"Publishes Alerts"| Broker
+    Broker -->|"Consumes Topics"| Sentinel
+    Sentinel <-->|"Persists Audit Logs"| DB
 ```
 </details>
 
@@ -81,10 +81,10 @@ flowchart TD;
 
 | Feature | Description |
 | :--- | :--- |
-| <img src="https://icongr.am/feather/lock.svg?size=18&color=A1A1A6" align="absmiddle" /> **Authentication & JWT** | Validates incoming tokens centrally, ensuring unauthenticated requests are dropped at the edge. |
-| <img src="https://icongr.am/feather/map-pin.svg?size=18&color=A1A1A6" align="absmiddle" /> **Dynamic Routing** | Acts as a reverse proxy, mapping external API calls to internal microservice endpoints. |
-| <img src="https://icongr.am/feather/activity.svg?size=18&color=A1A1A6" align="absmiddle" /> **Rate Limiting** | Prevents abuse and DDoS attacks by throttling requests using a token bucket algorithm via Redis. |
-| <img src="https://icongr.am/feather/eye.svg?size=18&color=A1A1A6" align="absmiddle" /> **Traffic Observability** | Injects trace IDs and logs metric data for request profiling and debugging across the ecosystem. |
+| <img src="https://icongr.am/feather/radio.svg?size=18&color=A1A1A6" align="absmiddle" /> **Kafka Integration** | Consumes streams of high-throughput data asynchronously via dedicated Kafka topics. |
+| <img src="https://icongr.am/feather/database.svg?size=18&color=A1A1A6" align="absmiddle" /> **Immutable Auditing** | Persists a reliable, unalterable log of cross-service activities into a centralized PostgreSQL database. |
+| <img src="https://icongr.am/feather/eye.svg?size=18&color=A1A1A6" align="absmiddle" /> **System Observability** | Centralizes payload monitoring to track bottlenecks, failures, and unauthorized access attempts. |
+| <img src="https://icongr.am/feather/maximize-2.svg?size=18&color=A1A1A6" align="absmiddle" /> **Fault Tolerance** | Designed to survive network spikes; if Sentinel goes down, Kafka retains the events until it spins back up. |
 
 ---
 
@@ -92,49 +92,50 @@ flowchart TD;
 
 As a **Work in Progress (WIP)**, Sentinel is being built iteratively. Below is the current progress of the core modules:
 
-- [x] **Phase 1:** Project initialization and reverse proxy configuration.
-- [x] **Phase 2:** Integration of global JWT validation filters.
-- [ ] **Phase 3:** Redis integration for distributed rate limiting.
-- [ ] **Phase 4:** Circuit breakers and fallback mechanisms for downstream service failures.
-- [ ] **Phase 5:** Comprehensive unit and integration test coverage.
+- [x] **Phase 1:** Project initialization and PostgreSQL schema setup.
+- [x] **Phase 2:** Apache Kafka consumer configuration and listener bindings.
+- [ ] **Phase 3:** Deserialization of complex system event payloads.
+- [ ] **Phase 4:** Threat detection rules (e.g., flagging multiple failed tasks/logins).
+- [ ] **Phase 5:** REST endpoints for administrators to query the audit logs.
 
 ---
 
 ## <img src="https://icongr.am/feather/terminal.svg?size=24&color=A1A1A6" align="absmiddle" /> Deployment & Setup
 
-To run Sentinel locally, ensure you have **Java 17+**, **Maven 3.8+**, and **Redis** running.
+To run Sentinel locally, ensure you have **Java 17+**, **Maven 3.8+**, **PostgreSQL**, and **Apache Kafka / Zookeeper** running in your local environment or via Docker.
 
-### 1. Cache Configuration
-Ensure your local Redis instance is running on the default port `6379`. This is required for the rate limiter to function.
+### 1. Database & Kafka Configuration
+Ensure your PostgreSQL database (e.g., `db_sentinel`) is created. You will also need Kafka running on its default port (`9092`).
 
 ### 2. Environment Variables
-Configure your `application.properties` or `application.yml` with your local routing variables:
+Configure your `application.properties` or `application.yml` with your local credentials:
 
 ```yaml
 # Server Configuration
-server.port: 8080
+server.port: 8084
 
-# Redis Configuration (Rate Limiting)
-spring.redis.host: localhost
-spring.redis.port: 6379
+# Database Configuration (Audit Schema)
+spring.datasource.url: jdbc:postgresql://localhost:5432/db_sentinel
+spring.datasource.username: your_postgres_user
+spring.datasource.password: your_postgres_password
+spring.jpa.hibernate.ddl-auto: update
 
-# JWT Validation
-api.security.token.secret: your_super_secret_key_here
-
-# Microservice Routing Rules
-routes.task-engine.url: http://localhost:8082
-routes.notification-service.url: http://localhost:8083
+# Apache Kafka Configuration
+spring.kafka.bootstrap-servers: localhost:9092
+spring.kafka.consumer.group-id: sentinel-auditor-group
+spring.kafka.consumer.auto-offset-reset: earliest
 ```
 
 ### 3. Build & Execute
-Navigate to the project root directory and start the Gateway application:
+Navigate to the project root directory and start the Spring Boot application:
 
 ```bash
 # Clone the repository
 git clone https://github.com/pedroforbeck/sentinel.git
-
-# Navigate to the directory
 cd sentinel
+
+# Switch to the active development branch
+git checkout develop
 
 # Run the application
 ./mvnw spring-boot:run
