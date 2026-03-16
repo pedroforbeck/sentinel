@@ -1,4 +1,4 @@
-package com.sentinel.api.model;
+package com.sentinel.api.entity;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;

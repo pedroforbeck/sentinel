@@ -3,7 +3,7 @@ package com.sentinel.api.controller;
 
 import com.sentinel.api.dto.in.MachineRegistrationDTO;
 import com.sentinel.api.dto.out.MachineResponseDTO;
-import com.sentinel.api.model.Machine;
+import com.sentinel.api.entity.Machine;
 import com.sentinel.api.repository.MachineRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.bind.annotation.*;

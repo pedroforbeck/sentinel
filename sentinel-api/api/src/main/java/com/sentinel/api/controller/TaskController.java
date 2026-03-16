@@ -2,8 +2,8 @@ package com.sentinel.api.controller;
 
 import com.sentinel.api.dto.in.TaskRequestDTO;
 import com.sentinel.api.dto.out.TaskResponseDTO;
-import com.sentinel.api.model.Machine;
-import com.sentinel.api.model.Task;
+import com.sentinel.api.entity.Machine;
+import com.sentinel.api.entity.Task;
 import com.sentinel.api.repository.MachineRepository;
 import com.sentinel.api.repository.TaskRepository;
 import com.sentinel.api.service.TaskProducerService;
