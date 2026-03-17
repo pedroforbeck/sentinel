@@ -1,11 +1,9 @@
 name: Sentinel Mesh CI
-
 on:
   push:
     branches: [ "main", "master" ]
   pull_request:
     branches: [ "main", "master" ]
-
 jobs:
   build-api:
     name: Build Sentinel API
@@ -13,32 +11,27 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
-
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
           cache: 'maven'
-
       - name: Compile and Package API
-        working-directory: ./sentinel-api
+        working-directory: ./sentinel-mesh/sentinel-api/api
         run: mvn clean package -DskipTests
-
   build-agent:
     name: Build Sentinel Agent
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
-
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
           cache: 'maven'
-
       - name: Compile and Package Agent
-        working-directory: ./sentinel-agent
+        working-directory: ./sentinel-mesh/sentinel-agent
         run: mvn clean package -DskipTests
