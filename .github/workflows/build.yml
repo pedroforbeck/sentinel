@@ -18,7 +18,7 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
       - name: Compile and Package API
-        working-directory: ./sentinel-mesh/sentinel-api/api
+        working-directory: ./sentinel-api/api
         run: mvn clean package -DskipTests
 
   build-agent:
@@ -34,5 +34,5 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
       - name: Compile and Package Agent
-        working-directory: ./sentinel-mesh/sentinel-agent/agent
+        working-directory: ./sentinel-agent/agent
         run: mvn clean package -DskipTests
