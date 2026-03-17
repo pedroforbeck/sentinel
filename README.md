@@ -45,6 +45,7 @@
 - [System Architecture](#-system-architecture)
 - [Components](#-components)
 - [Observability Stack](#-observability-stack)
+- [Screenshots](#-screenshots)
 - [API Reference](#-api-reference)
 - [Development Roadmap](#-development-roadmap)
 - [Deployment and Setup](#-deployment--setup)
@@ -134,6 +135,23 @@ The Grafana dashboard provides real-time visibility into:
 
 ---
 
+## <img src="https://icongr.am/feather/monitor.svg?size=24&color=A1A1A6" align="absmiddle" /> Screenshots
+
+Visualizing the Sentinel API's performance, metrics, and logs during standard operation and under stress testing.
+
+<table align="center">
+  <tr>
+    <td align="center"><b>Grafana Dashboard</b><br><br><img src="docs/graphena.jpg" alt="Grafana Dashboard" width="100%"></td>
+    <td align="center"><b>Dashboard Under Stress Test</b><br><br><img src="docs/stressgrafena.jpg" alt="Grafana Stress Test" width="100%"></td>
+  </tr>
+  <tr>
+    <td align="center"><b>Grafana Login</b><br><br><img src="docs/logingrafena.jpg" alt="Grafana Login" width="100%"></td>
+    <td align="center"><b>Application Logs</b><br><br><img src="docs/log.jpg" alt="Application Logs" width="100%"></td>
+  </tr>
+</table>
+
+---
+
 ## <img src="https://icongr.am/feather/code.svg?size=24&color=A1A1A6" align="absmiddle" /> API Reference
 
 All endpoints require the `X-API-KEY` header.
@@ -180,7 +198,7 @@ All endpoints require the `X-API-KEY` header.
 ### 1. Clone & Start Infrastructure
 
 ```bash
-git clone https://github.com/pedroforbeck/sentinel.git
+git clone [https://github.com/pedroforbeck/sentinel.git](https://github.com/pedroforbeck/sentinel.git)
 cd sentinel
 git checkout develop
 
