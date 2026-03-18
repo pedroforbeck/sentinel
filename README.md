@@ -141,7 +141,7 @@ Visualizing the Sentinel API's performance, metrics, and logs during standard op
 
 <table align="center">
   <tr>
-    <td align="center"><b>Grafana Dashboard</b><br><br><img src="docs/graphena.jpg" alt="Grafana Dashboard" width="100%"></td>
+    <td align="center"><b>Grafana Dashboard</b><br><br><img src="docs/dashboard.jpg" alt="Grafana Dashboard" width="100%"></td>
     <td align="center"><b>Dashboard Under Stress Test</b><br><br><img src="docs/stressgrafena.jpg" alt="Grafana Stress Test" width="100%"></td>
   </tr>
   <tr>
