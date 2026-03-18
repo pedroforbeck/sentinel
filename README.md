@@ -146,7 +146,7 @@ Visualizing the Sentinel API's performance, metrics, and logs during standard op
   </tr>
   <tr>
     <td align="center"><b>Grafana Login</b><br><br><img src="docs/logingrafena.jpg" alt="Grafana Login" width="100%"></td>
-    <td align="center"><b>Application Logs</b><br><br><img src="docs/lterminal.jpg" alt="Application Logs" width="100%"></td>
+    <td align="center"><b>Application Logs</b><br><br><img src="docs/terminal.jpg" alt="Application Logs" width="100%"></td>
   </tr>
 </table>
 
